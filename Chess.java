@@ -1,5 +1,3 @@
-// Krishaan Chaudhary & Preston Clawson
-
 package chess;
 
 import java.util.ArrayList;
@@ -91,15 +89,12 @@ public class Chess {
         mEndRow = 8 - Character.getNumericValue(newStr.charAt(3));
         mEndCol = newStr.charAt(2) - 'a';
 
-        // temporary display print statement for debugging
-        //System.out.println("" + mStartRow + " " + mStartCol + " " + mEndRow + " " + mEndCol);
-
         // Addressing illegal turns - 1. start cell is empty, 2. start cell has opponents piece, 3. end cell has allied piece
+        
         if (myBoard.board[mStartRow][mStartCol] == null){ // 1. start cell is empty
             ReturnPlay result = new ReturnPlay();
             result.piecesOnBoard = myPieces;
             result.message = ReturnPlay.Message.ILLEGAL_MOVE;
-            //System.out.println("no piece there");
             return result;
         }
 
@@ -107,7 +102,6 @@ public class Chess {
             ReturnPlay result = new ReturnPlay();
             result.piecesOnBoard = myPieces;
             result.message = ReturnPlay.Message.ILLEGAL_MOVE;
-            //System.out.println("not your turn");
             return result;
         }
 
@@ -116,7 +110,6 @@ public class Chess {
                 ReturnPlay result = new ReturnPlay();
                 result.piecesOnBoard = myPieces;
                 result.message = ReturnPlay.Message.ILLEGAL_MOVE;
-                //System.out.println("friendly fire");
                 return result;
             }
         }
@@ -129,21 +122,7 @@ public class Chess {
             Board testBoard = myBoard.copy();
             testBoard.update(mStartRow, mStartCol, mEndRow, mEndCol); // update the Board so it represents the moved piece
 
-//            System.out.println("test board-------");
-//            for (int r = 0; r < 8; r++){
-//                for (int c = 0; c < 8; c++){
-//                    if (testBoard.board[r][c] == null){
-//                        System.out.print("-- ");
-//                    } else {
-//                        System.out.print(testBoard.board[r][c] + " ");
-//                    }
-//                }
-//                System.out.println();
-//            }
-//            System.out.println("----------------");
-
-
-            if(turn){ // white tried to endanger themselves
+            if(turn){ // check if white endangered their own king - illegal move
                 for (int r = 0; r < 8; r++){
                     for (int c = 0; c < 8; c++){
                         if (testBoard.board[r][c] != null && !(testBoard.board[r][c].white)){
@@ -151,13 +130,12 @@ public class Chess {
                                 ReturnPlay result = new ReturnPlay();
                                 result.piecesOnBoard = myPieces;
                                 result.message = ReturnPlay.Message.ILLEGAL_MOVE;
-                                //System.out.println("white tried self-endangerment");
                                 return result;
                             }
                         }
                     }
                 }
-            } else { // black tried to endanger themselves
+            } else { // check if black endangered their own king - illegal move
                 for (int r = 0; r < 8; r++){
                     for (int c = 0; c < 8; c++){
                         if (testBoard.board[r][c] != null && testBoard.board[r][c].white){
@@ -165,7 +143,6 @@ public class Chess {
                                 ReturnPlay result = new ReturnPlay();
                                 result.piecesOnBoard = myPieces;
                                 result.message = ReturnPlay.Message.ILLEGAL_MOVE;
-                                //System.out.println("black tried self-endangerment");
                                 return result;
                             }
                         }
@@ -190,12 +167,10 @@ public class Chess {
                         } else {
                             myBoard.promoteTo = "Q";
                         }
-                        //System.out.println("white Pawn Promotion");
-                    } else {
+                    } else { // illegal attempt at pawn promotion
                         ReturnPlay result = new ReturnPlay();
                         result.piecesOnBoard = myPieces;
                         result.message = ReturnPlay.Message.ILLEGAL_MOVE;
-                        //System.out.println("white can't promote that");
                         return result;
                     }
 
@@ -206,12 +181,10 @@ public class Chess {
                         } else {
                             myBoard.promoteTo = "Q";
                         }
-                        //System.out.println("black Pawn Promotion");
-                    } else {
+                    } else { // illegal attempt at pawn promotion
                         ReturnPlay result = new ReturnPlay();
                         result.piecesOnBoard = myPieces;
                         result.message = ReturnPlay.Message.ILLEGAL_MOVE;
-                        //System.out.println("black can't promote that");
                         return result;
                     }
                 }
@@ -233,7 +206,7 @@ public class Chess {
                         }
                     }
                 }
-            } else {
+            } else { // check if black checked white
                 for (int r = 0; r < 8; r++){
                     for (int c = 0; c < 8; c++){
                         if (myBoard.board[r][c] != null && !(myBoard.board[r][c].white)){ // this piece is black
@@ -245,21 +218,18 @@ public class Chess {
                 }
             }
 
-
-            //System.out.println("White king at " + myBoard.whiteKingPosition[0] + ", " + myBoard.whiteKingPosition[1]);
-            //System.out.println("Black king at " + myBoard.blackKingPosition[0] + ", " + myBoard.blackKingPosition[1]);
             ReturnPlay result = updateReturnPlay(); // call a method that updates myPieces, and returns the ReturnPlay object
+
+            // Series of conditionals to determine the correct message for the ReturnPlay result
             if (drawRequested){
                 result.message = ReturnPlay.Message.DRAW;
             } else if (blackInCheck){
-                //System.out.println("I checked for black in checkmate");
                 if (isCheckmate(false)){
                     result.message = ReturnPlay.Message.CHECKMATE_WHITE_WINS;
                 } else {
                     result.message = ReturnPlay.Message.CHECK;
                 }
             } else if (whiteInCheck){
-                //System.out.println("I checked for white in checkmate");
                 if (isCheckmate(true)){
                     result.message = ReturnPlay.Message.CHECKMATE_BLACK_WINS;
                 } else {
@@ -268,14 +238,7 @@ public class Chess {
             } else {
                 result.message = null;
             }
-
             turn = !turn; // update to next players turn
-            if (turn){
-                //System.out.println("white's turn");
-            } else{
-                //System.out.println("black's turn");
-            }
-
             return result;
         } else{
             ReturnPlay result = new ReturnPlay();
@@ -286,6 +249,10 @@ public class Chess {
 
     }
 
+    /** 
+    Method to determine if the move resulted in checkmate - goes through each possible move of current player, and if none of them
+    can protect the king, it is checkmate
+    */
     public static boolean isCheckmate(boolean whiteTurn){
         for (int sr = 0; sr < 8; sr++){
             for (int sc = 0; sc < 8; sc++){
@@ -295,32 +262,8 @@ public class Chess {
                             if (myBoard.board[er][ec] == null || myBoard.board[er][ec].white != whiteTurn) {
                                 if (myBoard.board[sr][sc].isValid(sr, sc, er, ec, myBoard)) {
                                     Board testBoard = myBoard.copy();
-//                                    //System.out.println("test board before update-------");
-//                                    for (int r = 0; r < 8; r++) {
-//                                        for (int c = 0; c < 8; c++) {
-//                                            if (testBoard.board[r][c] == null) {
-//                                                System.out.print("-- ");
-//                                            } else {
-//                                                System.out.print(testBoard.board[r][c] + " ");
-//                                            }
-//                                        }
-//                                        System.out.println();
-//                                    }
-//                                    System.out.println("----------------");
                                     testBoard.update(sr, sc, er, ec);
                                     if (!isChecked(whiteTurn, testBoard)) {
-//                                        System.out.println("test board-------");
-//                                        for (int r = 0; r < 8; r++) {
-//                                            for (int c = 0; c < 8; c++) {
-//                                                if (testBoard.board[r][c] == null) {
-//                                                    System.out.print("-- ");
-//                                                } else {
-//                                                    System.out.print(testBoard.board[r][c] + " ");
-//                                                }
-//                                            }
-//                                            System.out.println();
-//                                        }
-//                                        System.out.println("----------------");
                                         return false;
                                     }
                                 }
@@ -333,6 +276,7 @@ public class Chess {
         return true;
     }
 
+    // Method to check if a king is in check
     public static boolean isChecked(boolean whiteTurn, Board board){
         int kingRow = whiteTurn ? board.whiteKingPosition[0] : board.blackKingPosition[0];
         int kingCol = whiteTurn ? board.whiteKingPosition[1] : board.blackKingPosition[1];
@@ -395,6 +339,8 @@ public class Chess {
      * This method should reset the game, and start from scratch.
      */
     public static void start() {
+        
+        // Resets all game variables, and sets turn to true (white)
         myPieces = new ArrayList<ReturnPiece>();
         myBoard = new Board();
         turn = true;
