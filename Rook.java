@@ -1,8 +1,12 @@
 package chess;
+
 import java.lang.Math.*;
+
 public class Rook extends Piece{
 
     private String symbol = "R";
+
+    // Constructor for Rook
     public Rook(boolean white){
         super(white);
         if (white){
@@ -12,15 +16,17 @@ public class Rook extends Piece{
         }
     }
 
+    // Overriding toString method to return string representation of Rook
     public String toString(){
         return this.symbol;
     }
 
     @Override
+    // Overriding Piece class' isValid method to determine if valid Rook Move
     public boolean isValid(int startR, int startC, int endR, int endC, Board board) {
 
         if (startR != endR && startC != endC) {
-            //System.out.println("Illegal rook move: Must move along a rank or file.");
+            // Illegal rook move - must move along rank/file
             return false;
         }
 
@@ -29,12 +35,12 @@ public class Rook extends Piece{
 
         for (int i = startR + rowIncrement, j = startC + colIncrement; i != endR || j != endC; i += rowIncrement, j += colIncrement) {
             if (board.board[i][j] != null) {
-                //System.out.println("Illegal rook move: Piece in the way.");
+                // Illegal rook move - piece in the way
                 return false;
             }
         }
 
-        //System.out.println("Legal rook move");
+        // legal rook move
         return true;
 
     }
