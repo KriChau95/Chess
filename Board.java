@@ -1,21 +1,28 @@
 package chess;
 
 public class Board {
-    Piece[][] board;
-    int[] whiteKingPosition;
 
+    // Initialize instance variables
+    Piece[][] board;
+
+    // Arrays of size two that store coordinates of kings' positions [r, c]
+    int[] whiteKingPosition;
     int[] blackKingPosition;
 
     String promoteTo = "";
 
+    // Boolean variables to keep track of castling rights
     boolean wks = true;
     boolean wqs = true;
     boolean bks = true;
     boolean bqs = true;
 
+    // Array to store coordinates of available enpassant destination square [r, c]
     int[] enpassant;
 
+    // Constructor - initializes appropriate instance variables
     public Board(){
+        
         board = new Piece[8][8];
         wks = true;
         wqs = true;
@@ -26,17 +33,6 @@ public class Board {
 
         whiteKingPosition = new int[]{7,4};
         blackKingPosition = new int[]{0,4};
-
-//        board[7][4] = new King(true);
-//        board[7][0] = new Rook(true);
-//        board[7][7] = new Rook(true);
-//        board[7][3] = new Queen(true);
-//
-//        board[0][4] = new King(false);
-//        board[0][0] = new Rook(false);
-//        board[0][7] = new Rook(false);
-//        board[0][3] = new Queen(false);
-
 
         board[7][0] = new Rook(true);
         board[7][1] = new Knight(true);
@@ -55,26 +51,22 @@ public class Board {
         board[0][5] = new Bishop(false);
         board[0][6] = new Knight(false);
         board[0][7] = new Rook(false);
-//
-////         testing line - REMOVE LATER
-////         board[2][6] = new Pawn(true);
-////         board[5][1] = new Pawn(false);
-//
+
         for (int c = 0; c < 8; c++){
             board[6][c] = new Pawn(true);
             board[1][c] = new Pawn(false);
         }
-
 
     }
 
     public void update(int sr, int sc, int er, int ec){
         enpassant[0] = 0;
         enpassant[1] = 0;
-        if (board[sr][sc] instanceof King && Math.abs(ec-sc) > 1){ // castling happened
+
+        // castling happened
+        if (board[sr][sc] instanceof King && Math.abs(ec-sc) > 1){ 
             if(sr == 7){ // white king
                 if (ec == 6){ // kingside castling
-                    //System.out.println("I RECOGNIZED CASTLING");
                     board[7][6] = new King(true);
                     board[7][4] = null;
                     board[7][5] = new Rook(true);
@@ -115,7 +107,7 @@ public class Board {
                 bqs = false;
             }
         }
-        else if (promoteTo.length() > 0){ // handle promotion case
+        else if (promoteTo.length() > 0){ // handle pawn promotion
             if (promoteTo.equals("Q")){
                 board[er][ec] = new Queen(board[sr][sc].white);
             } else if (promoteTo.equals("R")){
@@ -127,7 +119,7 @@ public class Board {
             }
             board[sr][sc] = null;
             promoteTo = "";
-        } else if (board[sr][sc] instanceof Pawn && Math.abs(ec-sc) == 1 && board[er][ec] == null){ // enpassant
+        } else if (board[sr][sc] instanceof Pawn && Math.abs(ec-sc) == 1 && board[er][ec] == null){ // handle enpassant
             if (board[sr][sc].white){
                 board[er][ec] = board[sr][sc];
                 board[sr][sc] = null;
@@ -147,15 +139,15 @@ public class Board {
             }
             board[er][ec] = board[sr][sc];
             board[sr][sc] = null;
-        } else {
+        } else { // some normal move
             board[er][ec] = board[sr][sc];
             board[sr][sc] = null;
-            if (sr == whiteKingPosition[0] && sc == whiteKingPosition[1]){
+            if (sr == whiteKingPosition[0] && sc == whiteKingPosition[1]){ // update position of white king
                 whiteKingPosition[0] = er;
                 whiteKingPosition[1] = ec;
                 wks = false;
                 wqs = false;
-            } else if (sr == blackKingPosition[0] && sc == blackKingPosition[1]){
+            } else if (sr == blackKingPosition[0] && sc == blackKingPosition[1]){ // update position of black king
                 blackKingPosition[0] = er;
                 blackKingPosition[1] = ec;
                 bks = false;
@@ -177,6 +169,7 @@ public class Board {
 
     }
 
+    // returns a copy of the current Board with the appropriate state
     public Board copy() {
         Board result = new Board();
 
@@ -222,7 +215,7 @@ public class Board {
         return result;
     }
 
-
+    // Method to visualize board
     public void printBoard(){
         for (int r = 0; r < 8; r++){
             for (int c = 0; c < 8; c++){
