@@ -4,6 +4,8 @@ import java.util.ArrayList;
 public class Knight extends Piece{
 
     private String symbol = "N";
+
+    // Constructor for Knight class
     public Knight(boolean white){
         super(white);
         if (white){
@@ -13,25 +15,23 @@ public class Knight extends Piece{
         }
     }
 
+    // Overrides toString method with appropriate display string
     public String toString(){
         return this.symbol;
     }
 
-    @Override
+    @Override 
+    // Overriding the Piece class' isValid method to check for valid Knight Move
     public boolean isValid(int startR, int startC, int endR, int endC, Board board) {
 
         if (Math.abs(endR - startR) == 2 && Math.abs(endC - startC) == 1){
-            //System.out.println("legal knight move");
             return true;
         }
         if (Math.abs(endR - startR) == 1 && Math.abs(endC - startC) == 2){
-            //System.out.println("legal knight move");
             return true;
         }
-        //System.out.println("illegal knight move");
+        // if we made it here, it must be an illegal knight move
         return false;
     }
-
-
 
 }
